@@ -127,6 +127,12 @@ h1 {
   color: #ffffff;
 }
 
+.error-message {
+  border-color: #f0b8b8;
+  background: #fff5f5;
+  color: #9b1c1c;
+}
+
 .message-bubble p {
   margin: 0;
   overflow-wrap: anywhere;

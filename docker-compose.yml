@@ -18,6 +18,8 @@ services:
       context: ./frontend
       args:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
+        VITE_AUTH_USERNAME: ${APP_AUTH_USERNAME:-admin}
+        VITE_AUTH_PASSWORD: ${APP_AUTH_PASSWORD:-admin1234}
     container_name: ai-agent-assistant-frontend
     ports:
       - "5173:80"
