@@ -1,0 +1,31 @@
+services:
+  backend:
+    build:
+      context: ./backend-spring
+    container_name: ai-agent-assistant-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      APP_AUTH_USERNAME: ${APP_AUTH_USERNAME:-admin}
+      APP_AUTH_PASSWORD: ${APP_AUTH_PASSWORD:-admin1234}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+    networks:
+      - ai-agent-assistant
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: ai-agent-assistant-frontend
+    ports:
+      - "5173:80"
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
+    depends_on:
+      - backend
+    networks:
+      - ai-agent-assistant
+
+networks:
+  ai-agent-assistant:
+    driver: bridge
