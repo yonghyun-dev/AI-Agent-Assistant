@@ -1,35 +1,40 @@
 services:
-  backend:
+  # FastAPI는 AI 처리 전용 내부 서비스입니다.
+  # 호스트 포트를 열지 않고 Docker 네트워크에만 노출해서 브라우저가 직접 호출하지 못하게 합니다.
+  backend-python:
     build:
       context: ./backend-python
     container_name: ai-agent-assistant-backend-python
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     environment:
-      APP_AUTH_USERNAME: ${APP_AUTH_USERNAME:-admin}
-      APP_AUTH_PASSWORD: ${APP_AUTH_PASSWORD:-admin1234}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
       OPENAI_API_KEY: ${OPENAI_API_KEY:?OPENAI_API_KEY is required for backend-python}
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4.1-mini}
     networks:
       - ai-agent-assistant
 
-  backend-spring:
-    profiles:
-      - spring
+  # Spring은 외부 API 게이트웨이입니다.
+  # React/Nginx에서 들어온 요청의 Basic Auth를 검증한 뒤 FastAPI로 메시지만 전달합니다.
+  backend:
     build:
       context: ./backend-spring
     container_name: ai-agent-assistant-backend-spring
     ports:
-      - "8081:8080"
+      - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: docker
       APP_AUTH_USERNAME: ${APP_AUTH_USERNAME:-admin}
       APP_AUTH_PASSWORD: ${APP_AUTH_PASSWORD:-admin1234}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+      # Compose 서비스 이름을 DNS처럼 사용해서 Spring 컨테이너가 FastAPI 컨테이너를 찾습니다.
+      PYTHON_BACKEND_BASE_URL: http://backend-python:8080
+    depends_on:
+      - backend-python
     networks:
       - ai-agent-assistant
 
+  # React 정적 파일은 Nginx가 서빙하고, /api 요청만 Spring 게이트웨이로 프록시합니다.
   frontend:
     build:
       context: ./frontend
