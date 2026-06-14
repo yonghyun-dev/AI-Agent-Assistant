@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     cors_allowed_origins: str = "http://localhost:5173"
     openai_api_key: str
     openai_model: str = "gpt-4.1-mini"
+    spring_api_base_url: str = "http://localhost:8080"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

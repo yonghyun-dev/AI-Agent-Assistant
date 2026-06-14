@@ -31,5 +31,5 @@ def chat(
 ) -> ChatResponse:
     # 외부 사용자 인증은 Spring 게이트웨이에서 담당합니다.
     # FastAPI는 Docker 내부 네트워크에서 Spring이 넘겨준 메시지를 실제 AI 처리로 연결합니다.
-    reply = run_chat_graph(request.message, current_settings)
+    reply = run_chat_graph(request.message, current_settings, request.session_id)
     return ChatResponse(reply=reply)
